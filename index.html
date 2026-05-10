@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dopamine Recovery Lab</title>
+  <style>
+    :root {
+      --bg: #f7f3eb;
+      --panel: #fffaf4;
+      --ink: #2f2a27;
+      --muted: #6b635e;
+      --accent: #d08a4f;
+      --accent-dark: #8f5c2f;
+      --soft-orange: #f6d6b8;
+      --soft-blue: #dce8f2;
+      --soft-green: #dbe9d8;
+      --soft-red: #efd3d3;
+      --soft-gold: #f4e4b7;
+      --radius: 22px;
+      --shadow: 0 12px 30px rgba(47,42,39,0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: radial-gradient(circle at top left, #fff8ef, var(--bg));
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      background: var(--soft-gold);
+      color: var(--accent-dark);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 6vw, 4.4rem);
+      line-height: 1;
+    }
+
+    .subtitle {
+      max-width: 820px;
+      margin: 18px auto 0;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 30px));
+      margin: 0 auto 40px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(255,250,244,0.95);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(208,138,79,0.18);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .cycle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cycle-step {
+      background: var(--soft-orange);
+      padding: 14px 16px;
+      border-radius: 18px;
+      min-width: 120px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+
+    .arrow {
+      font-size: 1.4rem;
+      color: var(--accent-dark);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      background: #eadfce;
+      color: var(--ink);
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .output {
+      margin-top: 18px;
+      border-radius: 18px;
+      padding: 16px;
+      background: white;
+      border: 1px solid rgba(47,42,39,0.12);
+      min-height: 150px;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .compare-box {
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .fast { background: var(--soft-red); }
+
+    .slow { background: var(--soft-green); }
+
+    ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    .slider-wrap { margin-top: 20px; }
+
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .meter {
+      margin-top: 20px;
+      height: 24px;
+      border-radius: 999px;
+      background: #e7ddd0;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 75%;
+      background: linear-gradient(90deg, #d08a4f, #f0c15d);
+      transition: width 0.3s ease;
+    }
+
+    .plan-list {
+      margin-top: 16px;
+      background: var(--soft-blue);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .activity-card {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(47,42,39,0.12);
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .activity-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.15rem;
+    }
+
+    .activity-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .pill {
+      display: inline-block;
+      background: #fffaf4;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.84rem;
+      font-weight: bold;
+      color: var(--accent-dark);
+      border: 1px solid rgba(208,138,79,0.22);
+    }
+
+    .brain-fact {
+      background: var(--soft-gold);
+      border-radius: 14px;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    .quote-box {
+      margin-top: 18px;
+      background: var(--soft-gold);
+      border-radius: 18px;
+      padding: 16px;
+      font-weight: bold;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .grid, .compare-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Interactive Recovery Neuroscience</div>
+    <h1>⚡ Dopamine Recovery Lab</h1>
+    <p class="subtitle">Explore how reward, motivation, boredom, cravings, stress, and recovery affect the brain’s dopamine system, and why healing takes repetition, patience, and rebuilding reward slowly over time.</p>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <div class="card">
+        <h2>📈 The Dopamine Loop</h2>
+        <p class="hint">Substances and high-intensity rewards often create short-term spikes followed by crashes and lower baselines over time.</p>
+
+        <div class="cycle">
+          <div class="cycle-step">Stress / Emptiness</div>
+          <div class="arrow">➜</div>
+          <div class="cycle-step">Quick Relief</div>
+          <div class="arrow">➜</div>
+          <div class="cycle-step">Dopamine Spike</div>
+          <div class="arrow">➜</div>
+          <div class="cycle-step">Crash</div>
+          <div class="arrow">➜</div>
+          <div class="cycle-step">Lower Baseline</div>
+          <div class="arrow">➜</div>
+          <div class="cycle-step">More Cravings</div>
+        </div>
+
+        <div class="quote-box">
+          The brain starts chasing relief harder while enjoying life less.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🎚️ Reward Sensitivity Meter</h2>
+        <p class="hint">This simplified visual shows how repeated high-intensity stimulation can temporarily lower sensitivity to everyday rewards.</p>
+
+        <div class="slider-wrap">
+          <label for="dopamineSlider"><strong>Intensity of Stimulation</strong></label>
+          <input type="range" id="dopamineSlider" min="10" max="100" value="75" />
+        </div>
+
+        <div class="meter">
+          <div class="meter-fill" id="meterFill"></div>
+        </div>
+
+        <div class="output" id="sliderOutput">
+          High-intensity reward patterns may make normal activities feel flat, boring, or emotionally quiet for a while during recovery.
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:22px;">
+      <div class="card">
+        <h2>😵 Why Does Everything Feel Boring?</h2>
+        <p class="hint">Choose a common experience in recovery or burnout.</p>
+
+        <div class="button-row" id="experienceButtons"></div>
+
+        <div class="output" id="experienceOutput">
+          Choose an experience to explore.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⚖️ Fast Dopamine vs Slow Dopamine</h2>
+        <p class="hint">Fast dopamine often creates intensity quickly. Slow dopamine usually builds more gradually but tends to be more stable and sustainable.</p>
+
+        <div class="compare-grid">
+          <div class="compare-box fast">
+            <h3>⚡ Fast Dopamine</h3>
+            <ul>
+              <li>Substances</li>
+              <li>Scrolling</li>
+              <li>Gambling</li>
+              <li>Chaos & drama</li>
+              <li>Impulsive spending</li>
+              <li>Risky behavior</li>
+              <li>Instant gratification</li>
+            </ul>
+          </div>
+
+          <div class="compare-box slow">
+            <h3>🌱 Slow Dopamine</h3>
+            <ul>
+              <li>Exercise</li>
+              <li>Music</li>
+              <li>Connection</li>
+              <li>Creativity</li>
+              <li>Sunlight & movement</li>
+              <li>Accomplishment</li>
+              <li>Helping others</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="quote-box">
+          Recovery often means retraining the brain to notice slower forms of reward again.
+        </div>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:22px;">
+      <div class="card">
+        <h2>🛠️ Build a Recovery Reward Plan</h2>
+        <p class="hint">Choose healthy activities that may help rebuild motivation, pleasure, and nervous system regulation over time.</p>
+
+        <div class="button-row" id="planButtons"></div>
+
+        <div class="plan-list" id="planOutput">
+          Select activities to build your recovery reward plan.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>💬 Group Discussion Prompts</h2>
+
+        <div class="output">
+          <ul>
+            <li>What used to give quick relief but left you emptier later?</li>
+            <li>What healthy activities feel “boring” right now, but may become rewarding with repetition?</li>
+            <li>How has stress changed your relationship with reward or motivation?</li>
+            <li>What does your brain chase when you are overwhelmed, lonely, anxious, or exhausted?</li>
+            <li>What small healthy reward helps your nervous system feel even slightly better?</li>
+            <li>How can recovery become more sustainable instead of only relying on willpower?</li>
+          </ul>
+        </div>
+
+        <div class="quote-box">
+          Healing the reward system is usually less about intensity and more about repetition.
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Educational tool only. This app is designed for psychoeducation, group discussion, recovery insight, and emotional regulation support.
+    </div>
+  </main>
+
+  <script>
+    const slider = document.getElementById('dopamineSlider');
+    const meterFill = document.getElementById('meterFill');
+    const sliderOutput = document.getElementById('sliderOutput');
+
+    slider.addEventListener('input', () => {
+      const value = slider.value;
+      meterFill.style.width = value + '%';
+
+      if (value > 75) {
+        sliderOutput.innerHTML = 'Very high-intensity stimulation can temporarily reduce sensitivity to slower, everyday rewards. This can contribute to boredom, restlessness, and craving cycles.';
+      } else if (value > 45) {
+        sliderOutput.innerHTML = 'Moderate stimulation may still affect reward sensitivity over time, especially during chronic stress or repeated dopamine spikes.';
+      } else {
+        sliderOutput.innerHTML = 'Lower-intensity, more sustainable rewards often help the brain rebuild balance and motivation gradually over time.';
+      }
+    });
+
+    const experiences = {
+      'Boredom': {
+        text: 'In early recovery, the brain may temporarily struggle to notice normal rewards after becoming used to high-intensity stimulation. Boredom is often part of nervous system recalibration, not proof that life will always feel empty.',
+        reflection: 'What healthy activity used to feel meaningless but might slowly regain value with repetition?'
+      },
+      'Low Motivation': {
+        text: 'The dopamine system helps drive motivation and anticipation. Stress, depression, trauma, and chronic substance use can all reduce motivation temporarily.',
+        reflection: 'What is one tiny action you could take even without feeling motivated first?'
+      },
+      'Anhedonia': {
+        text: 'Anhedonia means difficulty feeling pleasure. It often improves gradually as the reward system heals and the brain relearns slower forms of satisfaction.',
+        reflection: 'What moments still feel even 1% meaningful, peaceful, or enjoyable?'
+      },
+      'Cravings': {
+        text: 'Cravings are not just thoughts. They can involve memory, stress systems, body sensations, reward learning, and survival circuitry all activating together.',
+        reflection: 'What tends to happen emotionally before the craving begins?'
+      },
+      'Restlessness': {
+        text: 'A nervous system used to constant stimulation may initially struggle with stillness, quiet, or lower-intensity environments.',
+        reflection: 'What helps your nervous system slow down without feeling trapped?'
+      },
+      'Emotional Flatness': {
+        text: 'Sometimes the brain temporarily lowers emotional intensity overall while recovering from overwhelm, trauma, chronic stress, or repeated substance use.',
+        reflection: 'What helps you feel even slightly more connected or emotionally present?'
+      }
+    };
+
+    const experienceButtons = document.getElementById('experienceButtons');
+    const experienceOutput = document.getElementById('experienceOutput');
+
+    Object.keys(experiences).forEach(exp => {
+      const btn = document.createElement('button');
+      btn.textContent = exp;
+
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#experienceButtons button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        experienceOutput.innerHTML = `
+          <strong>${exp}</strong><br><br>
+          ${experiences[exp].text}<br><br>
+          <em>Reflection:</em> ${experiences[exp].reflection}
+        `;
+      });
+
+      experienceButtons.appendChild(btn);
+    });
+
+    const recoveryActivities = {
+      'Exercise': {
+        dose: '10 to 30 minutes',
+        unit: 'walk, bike, stretch, bodyweight circuit, or light cardio',
+        boosts: 'Dopamine, endorphins, BDNF, stress regulation',
+        why: 'Movement gives the brain a clean reward signal and helps the body burn off stress chemistry. It can also support neuroplasticity through BDNF, a growth-supporting brain protein.',
+        tryThis: 'Start with a 10-minute walk. Rate mood, energy, and craving intensity before and after.'
+      },
+      'Music': {
+        dose: '1 to 3 songs, about 5 to 12 minutes',
+        unit: 'listen, sing, drum, hum, or make a playlist',
+        boosts: 'Dopamine anticipation, emotion regulation, memory, connection',
+        why: 'Music can activate reward and emotion networks. The anticipation of a favorite part of a song can be rewarding before it even arrives.',
+        tryThis: 'Choose one song for calming, one for motivation, and one for feeling understood.'
+      },
+      'Sunlight': {
+        dose: '5 to 20 minutes',
+        unit: 'morning light, outdoor break, or sitting near natural light',
+        boosts: 'Circadian rhythm, serotonin support, sleep-wake regulation',
+        why: 'Light helps anchor the body clock. Better rhythm can improve sleep, mood stability, and daytime energy.',
+        tryThis: 'Get outdoor light within the first hour or two after waking when possible.'
+      },
+      'Journaling': {
+        dose: '3 to 10 minutes',
+        unit: 'brain dump, gratitude list, urge log, or one honest paragraph',
+        boosts: 'Prefrontal cortex organization, emotional labeling, memory processing',
+        why: 'Putting feelings into words can help the thinking brain organize emotional material. It can turn vague distress into something more workable.',
+        tryThis: 'Use this prompt, What am I feeling, what do I need, and what is one next right action?'
+      },
+      'Connection': {
+        dose: '2 to 15 minutes',
+        unit: 'text, call, meeting share, check-in, or safe conversation',
+        boosts: 'Oxytocin, safety cues, stress buffering, accountability',
+        why: 'Safe connection can help regulate the nervous system. The brain often calms more easily with co-regulation than with isolation.',
+        tryThis: 'Send one honest but simple text, I am having a hard moment and could use a check-in.'
+      },
+      'Creative Hobbies': {
+        dose: '10 to 30 minutes',
+        unit: 'drawing, music, crafts, cooking, writing, building, photography',
+        boosts: 'Dopamine, flow state, mastery, identity rebuilding',
+        why: 'Creative action gives the brain novelty, choice, and accomplishment without needing chaos or substances.',
+        tryThis: 'Make something small on purpose. The goal is completion, not perfection.'
+      },
+      'Walking': {
+        dose: '5 to 20 minutes',
+        unit: 'slow walk, brisk walk, hallway laps, outdoor loop',
+        boosts: 'Dopamine, endorphins, bilateral stimulation, stress discharge',
+        why: 'Walking is simple, measurable, and accessible. It can help cravings move through the body instead of staying trapped in rumination.',
+        tryThis: 'Walk for 7 minutes, then ask, did the urge change by even 5 percent?'
+      },
+      'Helping Others': {
+        dose: '1 small action',
+        unit: 'encouraging text, holding a door, helping clean, peer support',
+        boosts: 'Meaning, connection, reward, self-worth',
+        why: 'Helpful behavior can activate reward through purpose and connection. It also gives the brain evidence that you still have value to offer.',
+        tryThis: 'Do one useful thing that does not require rescuing, fixing, or overextending yourself.'
+      },
+      'Meditation': {
+        dose: '1 to 5 minutes to start',
+        unit: 'breathing, grounding, body scan, mindful listening',
+        boosts: 'Prefrontal regulation, attention control, nervous system settling',
+        why: 'Meditation is not about emptying the mind. It is practicing returning attention, which strengthens regulation over time.',
+        tryThis: 'Try 60 seconds of noticing breath, sound, or feet on the floor.'
+      },
+      'Healthy Meals': {
+        dose: '1 balanced snack or meal',
+        unit: 'protein, fiber, healthy fat, hydration, regular timing',
+        boosts: 'Blood sugar stability, neurotransmitter building blocks, mood regulation',
+        why: 'The brain needs raw materials. Hunger and blood sugar dips can make cravings, irritability, and anxiety feel stronger.',
+        tryThis: 'Add protein and water before deciding what your mood means.'
+      },
+      'Cold Water / Sauna': {
+        dose: '30 seconds to 10 minutes depending on method and safety',
+        unit: 'cool splash, cold shower finish, sauna, or contrast routine',
+        boosts: 'Arousal regulation, endorphins, stress resilience, body awareness',
+        why: 'Temperature shifts can create strong body-based signals without substances. They may help some people interrupt anxiety, cravings, or emotional stuckness.',
+        tryThis: 'Use a safe version, cool water on hands or face for 30 seconds, then slow breathing.'
+      },
+      'Sleep Routine': {
+        dose: '15 to 45 minute wind-down',
+        unit: 'same bedtime cues, dim lights, no-scroll window, calming routine',
+        boosts: 'Dopamine receptor recovery, memory consolidation, emotional regulation',
+        why: 'Sleep is when the brain repairs, organizes memory, and recalibrates stress and reward systems. Poor sleep makes cravings and emotional reactivity louder.',
+        tryThis: 'Pick one repeatable cue, dim lights, shower, music, reading, or phone away from bed.'
+      }
+    };
+
+    const selected = [];
+    const planButtons = document.getElementById('planButtons');
+    const planOutput = document.getElementById('planOutput');
+
+    function renderPlan() {
+      if (selected.length === 0) {
+        planOutput.innerHTML = 'Select activities to build your recovery reward plan.';
+        return;
+      }
+
+      planOutput.innerHTML = `
+        <strong>Your Recovery Reward Plan</strong><br>
+        <span class="hint">Choose a realistic dose. The goal is not to feel amazing instantly. The goal is to give the brain repeated proof that healthy rewards still exist.</span>
+        ${selected.map(item => {
+          const data = recoveryActivities[item];
+          return `
+            <div class="activity-card">
+              <h3>${item}</h3>
+              <div class="activity-meta">
+                <span class="pill">⏱️ ${data.dose}</span>
+                <span class="pill">📏 ${data.unit}</span>
+                <span class="pill">🧠 ${data.boosts}</span>
+              </div>
+              <strong>Why it helps:</strong> ${data.why}
+              <div class="brain-fact"><strong>Try this:</strong> ${data.tryThis}</div>
+            </div>
+          `;
+        }).join('')}
+        <em>Reminder:</em> The brain often rebuilds motivation after action, not before it.
+      `;
+    }
+
+    Object.keys(recoveryActivities).forEach(activity => {
+      const btn = document.createElement('button');
+      btn.textContent = activity;
+
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+
+        if (selected.includes(activity)) {
+          const index = selected.indexOf(activity);
+          selected.splice(index, 1);
+        } else {
+          selected.push(activity);
+        }
+
+        renderPlan();
+      });
+
+      planButtons.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
